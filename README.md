@@ -25,7 +25,7 @@ This project is a modular toolkit for simulating, analyzing, and visualizing sat
 - 📡 Ground station pass prediction (AOS, MAX, LOS with azimuth/elevation)
 - 🌍 2D and 3D satellite tracking on global maps
 - 🚨 Conjunction (collision) detection between multiple satellites
-- 🌐 Web dashboard with:
+- 🌐 Web dashboard with:(will be publishing as soon!!!)
   - One-click analysis
   - Downloadable CSV output
   - Real-time user feedback
