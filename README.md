@@ -13,7 +13,6 @@ This project is a modular toolkit for simulating, analyzing, and visualizing sat
 ├── satellite_map_2d.py             # 2D map visualization using folium
 ├── satellite_map_3d.py             # 3D globe visualization using Plotly
 ├── multi_conjunction_checker.py    # Multi-satellite collision detection
-├── ConjunctionDashboard.jsx        # React-based web dashboard
 ├── requirements.txt                # Python dependencies
 └── conjunction_warnings.csv        # (Optional) Output file for conjunction alerts
 ```
