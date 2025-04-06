@@ -58,8 +58,8 @@ def main():
     now = datetime.now(utc)
     times = [ts.utc(now + timedelta(minutes=i)) for i in range(0, 60, 10)]
 
-    username = "rsuluker001@gmail.com"
-    password = "GunesliDal1987!*_"
+    username = "your_username"
+    password = "your_password"
     print("Fetching active satellite TLEs from space-track.org...")
     tle_data = fetch_all_active_tles(username, password)
     print(f"✅ Fetched {len(tle_data)} satellites")
