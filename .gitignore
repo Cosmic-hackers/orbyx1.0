@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+
+# Database
+*.db
+*.sqlite3
+
+# Data files (generated)
+satellite_positions.csv
+conjunction-warning.csv
+satellite_track_2d.html
+satellite_track_3d.html
+
+# Rust
+rust_engine/target/
+rust_engine/*.lock
+
+# Cache
+.cache/
+*.pyc
+
+# Logs
+logs/
+*.log
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Coverage
+htmlcov/
+.coverage
+coverage.xml
