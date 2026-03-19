@@ -85,6 +85,66 @@ with tab_catalog:
         st.dataframe(df_types.rename(columns={"object_type": "Type", "count": "Count"}),
                      use_container_width=True, hide_index=True)
 
+    # Live sync from Space-Track / CelesTrak
+    st.markdown("#### Fetch Live TLE Data")
+    from src.config import get_settings
+    settings = get_settings()
+    has_spacetrack = bool(settings.spacetrack_username and settings.spacetrack_password)
+
+    col_src, col_grp, col_lim = st.columns([2, 2, 1])
+    with col_src:
+        source = st.selectbox(
+            "Source",
+            ["Space-Track.org", "CelesTrak", "Demo (offline)"] if has_spacetrack
+            else ["CelesTrak", "Demo (offline)"],
+        )
+    with col_grp:
+        if source == "Space-Track.org":
+            st_group = st.selectbox("Object Type", ["PAYLOAD", "ROCKET BODY", "DEBRIS"])
+        elif source == "CelesTrak":
+            from src.utils.celestrak_client import GROUPS
+            st_group = st.selectbox("Group", list(GROUPS.keys()), index=0)
+        else:
+            st_group = "demo"
+    with col_lim:
+        if source == "Space-Track.org":
+            fetch_limit = st.number_input("Limit", 100, 5000, 1000, step=100)
+        else:
+            fetch_limit = 0
+
+    if st.button("Fetch & Sync", type="primary"):
+        with st.spinner(f"Fetching from {source}..."):
+            fetched = []
+            sync_source = ""
+            if source == "Demo (offline)":
+                from src.utils.celestrak_client import get_demo_satellites
+                fetched = get_demo_satellites()
+                sync_source = "demo"
+            elif source == "CelesTrak":
+                from src.utils.celestrak_client import fetch_tle_group
+                fetched = fetch_tle_group(st_group)
+                sync_source = f"celestrak:{st_group}"
+            elif source == "Space-Track.org":
+                import asyncio
+                from src.utils.space_track_client import SpaceTrackClient
+                async def _fetch():
+                    async with SpaceTrackClient() as client:
+                        return await client.fetch_tle_latest(object_type=st_group, limit=fetch_limit)
+                fetched = asyncio.run(_fetch())
+                sync_source = f"space-track:{st_group}"
+
+            if fetched:
+                with SatelliteDB() as db2:
+                    added, updated = db2.upsert_satellites_batch(fetched)
+                    new_total = db2.get_satellite_count()
+                    db2.log_sync(added, updated, new_total, sync_source)
+                st.success(f"Synced {len(fetched)} satellites: {added} new, {updated} updated. Total: {new_total:,}")
+                st.rerun()
+            else:
+                st.error("No data fetched. Check credentials or network connection.")
+
+    st.markdown("---")
+
     # Manual TLE import
     st.markdown("#### Import TLE Data")
     tle_text = st.text_area(
