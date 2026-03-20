@@ -1,37 +1,68 @@
-from skyfield.api import load, EarthSatellite, wgs84, utc
-from datetime import datetime, timedelta
+from skyfield.api import load, wgs84
+from datetime import datetime, timezone
 import folium
+from folium.plugins import AntPath
+from utils import get_active_satellites
 
-def main():
-    # TLE data
-    tle_line1 = "1 52739U 22057H   22159.11954099  .00002612  00000+0  15663-3 0  9993"
-    tle_line2 = "2 52739  97.5193 273.9452 0009301 198.3423 161.7473 15.11805174  2023"
-    satellite = EarthSatellite(tle_line1, tle_line2, "OBJECT H")
+def generate_2d_map(output_path="static/satellite_track_2d.html"):
+    try:
+        satellites, _ = get_active_satellites()
+        if not satellites:
+            return False
 
-    ts = load.timescale()
-    now = datetime.now(utc)
+        ts = load.timescale()
+        now = datetime.now(timezone.utc)
 
-    # get positions at specific intervals ( like every 10 minutes)
-    points = []
-    for minutes in range(0, 180, 10):  #  3 hours periods
-        t = ts.utc(now.year, now.month, now.day, now.hour, now.minute + minutes)
-        geocentric = satellite.at(t)
-        subpoint = wgs84.subpoint(geocentric)
-        points.append((subpoint.latitude.degrees, subpoint.longitude.degrees))
+        m = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB dark_matter", zoom_control=False)
 
-    #  Create a Folium map
-    start_location = points[0]
-    m = folium.Map(location=start_location, zoom_start=3)
+        colors = ["#00f2ff", "#ff00ea", "#00ff88", "#ffea00", "#ff4d4d"]
+        
+        for i, satellite in enumerate(satellites):
+            color = colors[i % len(colors)]
+            segments = [[]]
+            last_lon = None
 
-    #   Add points and lines
-    folium.Marker(location=start_location, tooltip="Start").add_to(m)
-    folium.PolyLine(points, color="blue", weight=2.5, opacity=1).add_to(m)
-    for lat, lon in points:
-        folium.CircleMarker(location=(lat, lon), radius=3, color="red", fill=True).add_to(m)
+            for minutes in range(0, 180, 5):
+                t = ts.utc(now.year, now.month, now.day, now.hour, now.minute + minutes)
+                geocentric = satellite.at(t)
+                subpoint = wgs84.subpoint(geocentric)
+                lat, lon = subpoint.latitude.degrees, subpoint.longitude.degrees
 
-    #  save HTML file
-    m.save("satellite_track_2d.html")
-    print("✅ created 2D map: satellite_track_2d.html")
+                if last_lon is not None and abs(lon - last_lon) > 180:
+                    segments.append([])
+                
+                segments[-1].append((lat, lon))
+                last_lon = lon
+
+            # AntPath ile ANİMASYONLU YOL (Premium Look)
+            for segment in segments:
+                if len(segment) > 1:
+                    AntPath(
+                        locations=segment,
+                        color=color,
+                        weight=2,
+                        opacity=0.8,
+                        dash_array=[2, 10],
+                        pulse_color="#ffffff",
+                        delay=1000,
+                        tooltip=satellite.name
+                    ).add_to(m)
+            
+            # Canlı merkez noktası
+            if segments[0]:
+                folium.CircleMarker(
+                    location=segments[0][0], 
+                    radius=6, color=color, fill=True, 
+                    fill_opacity=1.0, popup=f"LIVE: {satellite.name}",
+                    weight=3
+                ).add_to(m)
+
+        m.save(output_path)
+        print(f"✅ Animasyonlu 2D Harita güncellendi: {output_path}")
+        return True
+    except Exception as e:
+        print(f"❌ 2D Animasyon hatası: {e}")
+        return False
 
 if __name__ == "__main__":
-    main()
+    generate_2d_map("satellite_track_2d.html")
