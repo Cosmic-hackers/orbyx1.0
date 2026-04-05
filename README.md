@@ -14,7 +14,6 @@ A professional, real-time satellite tracking dashboard with high-fidelity visual
 -   **📊 Dynamic Pass Prediction:** Calculates AOS (Rise), MAX (Peak), and LOS (Set) events for the next 24 hours, customized to your ground station.
 -   **🔔 Multi-Channel Alerting:**
     -   **On-Screen Alarms:** Visual banners flashing 15 minutes before a satellite passes.
-    -   **📲 Telegram Integration:** Automated status reports and pass alerts directly to your mobile device.
 -   **🛠️ Interactive Mission Control:** Update your ground station coordinates, add/remove satellites, and sync data in real-time from the web dashboard.
 
 ## 🛠️ Tech Stack
@@ -47,7 +46,6 @@ A professional, real-time satellite tracking dashboard with high-fidelity visual
 
 The system uses `config.json` for persistent storage, but you can manage everything via the UI:
 -   **Ground Station:** Set your city or exact Lat/Lon/Elevation.
--   **Telegram Comms:** Add your Bot Token and Chat ID to receive mobile alerts.
 
 ---
 *Developed with ❤️ for space exploration enthusiasts.*

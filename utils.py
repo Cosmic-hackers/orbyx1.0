@@ -33,8 +33,8 @@ def fetch_active_catalog():
     try:
         response = requests.get(url, timeout=15)
         response.raise_for_status()
-        with open(cache_path, 'w') as f:
-            f.write(response.text)
+        with open(cache_path, 'wb') as f:
+            f.write(response.content)
         return response.text.splitlines()
     except Exception as e:
         print(f"❌ Katalog indirilemedi: {e}")
@@ -43,15 +43,17 @@ def fetch_active_catalog():
 def get_satellite_from_catalog(name_or_id):
     """Katalog içinde isim veya NORAD ID ile arama yapar, TLE döner."""
     catalog = fetch_active_catalog()
-    # Katalog 3 satırlı formatta (Name, Line 1, Line 2)
-    for i in range(0, len(catalog) - 2, 3):
-        name = catalog[i].strip()
-        line1 = catalog[i+1]
-        line2 = catalog[i+2]
-        norad_id = line2.split()[1]
-        
-        if str(name_or_id).upper() in name.upper() or str(name_or_id) == norad_id:
-            return name, line1, line2
+    # Yalnızca geçerli TLE satırlarını arayalım
+    for i in range(len(catalog) - 2):
+        if catalog[i+1].startswith("1 ") and catalog[i+2].startswith("2 "):
+            name = catalog[i].strip()
+            line1 = catalog[i+1]
+            line2 = catalog[i+2]
+            parts = line2.split()
+            if len(parts) > 1:
+                norad_id = parts[1]
+                if str(name_or_id).upper() in name.upper() or str(name_or_id) == norad_id:
+                    return name, line1, line2
     return None
 
 def get_active_satellites():
@@ -114,25 +116,7 @@ def get_upcoming_passes(satellite, ground_station, hours=24):
                 
     return passes
 
-def send_telegram_alert(message):
-    """Telegram üzerinden bildirim gönderir."""
-    config = load_config()
-    bot_token = config.get("telegram", {}).get("bot_token")
-    chat_id = config.get("telegram", {}).get("chat_id")
-    
-    if not bot_token or not chat_id:
-        # print("⚠️ Telegram ayarları yapılmamış.")
-        return False
-        
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
-    
-    try:
-        response = requests.post(url, json=payload, timeout=10)
-        return response.status_code == 200
-    except Exception as e:
-        print(f"❌ Telegram gönderilemedi: {e}")
-        return False
+
 
 if __name__ == "__main__":
     # Test
@@ -144,8 +128,7 @@ if __name__ == "__main__":
         p = get_upcoming_passes(sats[0], gs)
         print(f"✅ {len(p)} geçiş bulundu.")
     
-    # Telegram Test
-    # send_telegram_alert("🚀 Satellite Tracking System Online!")
+
 
 if __name__ == "__main__":
     # Test etmek için basit bir kontrol

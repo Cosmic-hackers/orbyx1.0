@@ -1,14 +1,70 @@
 {
     "satellites": [
-        {"name": "ISS (ZARYA)", "norad_id": 25544},
-        {"name": "HUBBLE", "norad_id": 20580},
-        {"name": "STARLINK-1007", "norad_id": 44713}
+        {
+            "name": "ISS (ZARYA)",
+            "norad_id": "25544",
+            "category": "Space Stations"
+        },
+        {
+            "name": "CSS (TIANGONG)",
+            "norad_id": "48274",
+            "category": "Space Stations"
+        },
+        {
+            "name": "HST (HUBBLE)",
+            "norad_id": "20580",
+            "category": "Space Stations & Telescopes"
+        },
+        {
+            "name": "AQUA",
+            "norad_id": "27424",
+            "category": "Earth Observation"
+        },
+        {
+            "name": "TERRA",
+            "norad_id": "25994",
+            "category": "Earth Observation"
+        },
+        {
+            "name": "SUOMI NPP",
+            "norad_id": "37849",
+            "category": "Earth Observation"
+        },
+        {
+            "name": "NOAA 19",
+            "norad_id": "33591",
+            "category": "Earth Observation"
+        },
+        {
+            "name": "NAVSTAR 62 (GPS)",
+            "norad_id": "32711",
+            "category": "Navigation"
+        },
+        {
+            "name": "GALILEO-FOC FM1",
+            "norad_id": "40128",
+            "category": "Navigation"
+        },
+        {
+            "name": "STARLINK-1007",
+            "norad_id": "44713",
+            "category": "Communications"
+        },
+        {
+            "name": "IRIDIUM 113",
+            "norad_id": "42560",
+            "category": "Communications"
+        },
+        {
+            "name": "CALSPHERE 1",
+            "norad_id": "00900"
+        }
     ],
     "ground_station": {
         "name": "Kennedy Space Center",
-        "latitude": 28.572,
+        "latitude": 28.571,
         "longitude": -80.648,
-        "elevation_m": 3
+        "elevation_m": 3.0
     },
     "settings": {
         "conjunction_threshold_km": 10.0,

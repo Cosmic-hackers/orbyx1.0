@@ -6,8 +6,7 @@ import os
 import json
 from utils import (
     get_active_satellites, load_config, get_satellite_from_catalog, 
-    fetch_active_catalog, get_ground_station, get_upcoming_passes,
-    send_telegram_alert
+    fetch_active_catalog, get_ground_station, get_upcoming_passes
 )
 from satellite_map_2d import generate_2d_map
 from satellite_map_3d import generate_3d_map
@@ -50,37 +49,36 @@ def save_config(config):
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     config = load_config()
+    sats = config.get("satellites", [])
+    for s in sats:
+        if "category" not in s:
+            s["category"] = "Custom / Searched"
+            
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "satellites": config.get("satellites", []),
-        "ground_station": config.get("ground_station", {}),
-        "telegram": config.get("telegram", {})
+        "satellites": sats,
+        "ground_station": config.get("ground_station", {})
     })
 
-@app.post("/update-telegram")
-async def update_telegram(bot_token: str = Form(...), chat_id: str = Form(...)):
-    config = load_config()
-    config['telegram'] = {"bot_token": bot_token, "chat_id": chat_id}
-    save_config(config)
-    return {"status": "success"}
-
-@app.post("/test-telegram")
-async def test_telegram():
-    success = send_telegram_alert("🚀 <b>Mission Control Online!</b> \nSatellite Tracking System is linked to Telegram.")
-    return {"status": "success" if success else "failed"}
 
 @app.get("/search")
 async def search_satellites(q: str):
     """Katalogda arama yapar ve ilk 10 sonucu döner."""
+    if not q or len(q) < 2:
+        return []
+
     catalog = fetch_active_catalog()
     results = []
-    for i in range(0, len(catalog) - 2, 3):
-        name = catalog[i].strip()
-        line2 = catalog[i+2]
-        norad_id = line2.split()[1]
-        if q.upper() in name.upper() or q == norad_id:
-            results.append({"name": name, "norad_id": norad_id})
-        if len(results) >= 10: break
+    for i in range(len(catalog) - 2):
+        if catalog[i+1].startswith("1 ") and catalog[i+2].startswith("2 "):
+            name = catalog[i].strip()
+            line2 = catalog[i+2]
+            parts = line2.split()
+            if len(parts) > 1:
+                norad_id = parts[1]
+                if q.upper() in name.upper() or q in norad_id:
+                    results.append({"name": name, "norad_id": norad_id})
+                if len(results) >= 10: break
     return results
 
 @app.post("/add-satellite")

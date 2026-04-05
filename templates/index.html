@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Satellite Orbit Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>ORBYX Mission Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d1117;
-            --sidebar-color: #161b22;
-            --accent-color: #58a6ff;
-            --text-main: #c9d1d9;
-            --text-dim: #8b949e;
-            --success: #238636;
-            --card-border: rgba(255, 255, 255, 0.1);
+            --bg-color: #030613;
+            --sidebar-color: rgba(6, 11, 26, 0.85);
+            --accent-cyan: #00f3ff;
+            --accent-magenta: #ff00ff;
+            --accent-yellow: #fcee0a;
+            --text-main: #d1f8ff;
+            --text-dim: #5c99a6;
+            --success: #00ff66;
+            --danger: #ff003c;
+            --card-border: rgba(0, 243, 255, 0.3);
+            --card-bg: rgba(0, 20, 40, 0.4);
+            --neon-glow: 0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3);
+            --magenta-glow: 0 0 10px rgba(255, 0, 255, 0.6);
+            --grid-color: rgba(0, 243, 255, 0.05);
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Rajdhani', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
@@ -26,59 +35,105 @@
             height: 100vh;
             overflow: hidden;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(88, 166, 255, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(255, 0, 234, 0.05) 0px, transparent 50%);
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center center;
+            position: relative;
+        }
+
+        /* Scanline effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        h1, h2, h3, .status-badge {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         header {
-            padding: 0.8rem 2rem;
-            background: rgba(22, 27, 34, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 2rem;
+            background: rgba(3, 6, 19, 0.9);
+            border-bottom: 2px solid var(--accent-cyan);
+            box-shadow: 0 4px 20px rgba(0, 243, 255, 0.15);
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
+            position: relative;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0; width: 100%; height: 2px;
+            background: var(--accent-cyan);
+            box-shadow: var(--neon-glow);
         }
 
         .main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
+            flex-direction: row;
         }
 
         .sidebar {
-            width: 320px;
-            background: rgba(22, 27, 34, 0.5);
-            backdrop-filter: blur(5px);
+            width: 340px;
+            background: var(--sidebar-color);
+            backdrop-filter: blur(10px);
             border-right: 1px solid var(--card-border);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.5);
             padding: 1.5rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            position: relative;
+            z-index: 10;
         }
 
         .content {
             flex: 1;
-            padding: 1rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
             overflow-y: auto;
-            background: rgba(0, 0, 0, 0.2);
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.2rem;
-            transition: transform 0.2s, background 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 3px; height: 100%;
+            background: var(--accent-cyan);
+            box-shadow: var(--neon-glow);
+        }
+
         .card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
+            background: rgba(0, 243, 255, 0.05);
+            border-color: var(--accent-cyan);
+            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1);
         }
 
         .map-container {
@@ -87,20 +142,23 @@
             display: flex;
             flex-direction: column;
             background: #000;
-            border-radius: 16px;
+            border-radius: 4px;
             border: 1px solid var(--card-border);
-            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
             position: relative;
         }
 
         .map-header {
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem 1rem;
+            background: rgba(0, 243, 255, 0.1);
+            border-bottom: 1px solid var(--accent-cyan);
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.9rem;
-            border-bottom: 1px solid var(--card-border);
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 5px var(--accent-cyan);
         }
 
         .map-frame {
@@ -108,6 +166,7 @@
             width: 100%;
             height: 100%;
             border: none;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" x="50" text-anchor="middle" font-family="monospace" font-size="6" fill="%2300f3ff" opacity="0.5">ESTABLISHING LINK...</text></svg>') center center no-repeat;
         }
 
         .satellite-item {
@@ -116,36 +175,74 @@
             gap: 12px;
             padding: 0.8rem;
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            margin-bottom: 0.8rem;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 2px;
+            margin-bottom: 0.6rem;
+            transition: 0.2s;
+            border-left: 3px solid var(--accent-cyan);
+        }
+        
+        .satellite-item:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--accent-cyan);
         }
 
         .sat-icon {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            box-shadow: 0 0 10px currentColor;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-cyan);
+            box-shadow: var(--neon-glow);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
         }
 
         .btn {
-            background: var(--accent-color);
-            color: #0b0e14;
-            border: none;
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
             padding: 0.7rem 1.4rem;
-            border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
             display: flex;
             align-items: center;
             gap: 8px;
             transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
         .btn:hover {
-            filter: brightness(1.1);
-            transform: scale(1.02);
+            box-shadow: var(--neon-glow);
+            background: rgba(0, 243, 255, 0.2);
+            color: #fff;
         }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+
         .btn:active { transform: scale(0.98); }
+        
+        .btn-magenta {
+            border-color: var(--accent-magenta);
+            color: var(--accent-magenta);
+            background: rgba(255, 0, 255, 0.1);
+        }
+        .btn-magenta:hover {
+            box-shadow: var(--magenta-glow);
+            background: rgba(255, 0, 255, 0.2);
+        }
 
         .spinner {
             animation: rotate 2s linear infinite;
@@ -157,31 +254,152 @@
         }
 
         .status-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: var(--success);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            border: 1px solid var(--success);
+            color: var(--success);
+            background: rgba(0, 255, 102, 0.1);
+            text-shadow: 0 0 5px var(--success);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+            clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
         }
 
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); border-left: 1px solid #111; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 0; }
+        
+        input {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+        input:focus {
+            border-color: var(--accent-cyan) !important;
+            box-shadow: var(--neon-glow);
+        }
+        
+        .grid-layout { display: grid; grid-template-columns: 2fr 1.2fr; gap: 1.5rem; flex: 1; min-height: 400px; }
+
+        /* Initial loader overlay */
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-family: 'Orbitron', sans-serif; color: var(--accent-cyan);
+            animation: fadeOut 0.5s ease-in-out 2.5s forwards;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+        }
+        .hacker-window {
+            border: 1px solid var(--accent-cyan);
+            background: rgba(0, 10, 15, 0.95);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(0, 243, 255, 0.05);
+            width: 500px;
+            max-width: 90vw;
+            display: flex;
+            flex-direction: column;
+        }
+        .window-header {
+            background: var(--accent-cyan);
+            color: #000;
+            padding: 5px 10px;
+            font-family: 'Rajdhani', monospace;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .window-controls {
+            letter-spacing: 2px;
+        }
+        .window-content {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .loader-glitch { font-size: 2.5rem; letter-spacing: 8px; animation: glitch 0.2s infinite; text-shadow: var(--neon-glow), 0 0 40px var(--accent-cyan); margin-bottom: 20px; text-transform: uppercase; }
+        .cyber-progress { width: 300px; height: 3px; background: rgba(0,243,255,0.1); position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
+        .cyber-progress::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: var(--accent-cyan);
+            animation: loadBar 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            box-shadow: 0 0 15px var(--accent-cyan);
+        }
+        @keyframes loadBar { 0% { left: -100%; } 100% { left: 0; } }
+        .hack-text { font-family: 'Rajdhani', monospace; font-size: 0.9rem; color: var(--success); text-align: left; width: 300px; text-shadow: 0 0 5px var(--success); }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 1px) }
+            40% { transform: translate(-1px, -1px) }
+            60% { transform: translate(2px, 1px) }
+            80% { transform: translate(1px, -1px) }
+            100% { transform: translate(0) }
+        }
+
+        /* Responsive Media Queries */
+        @media (max-width: 1024px) {
+            .grid-layout { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; overflow-y: auto; height: auto; }
+            body { overflow-y: auto; overflow-x: hidden; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 2px solid var(--accent-cyan); flex-shrink: 0; max-height: none; }
+            .content { overflow-y: visible; padding-bottom: 20px;}
+            .map-container { min-height: 350px; }
+            header { flex-direction: column; gap: 15px; text-align: center; }
+            #loader-overlay { display: none; } /* Disable loader on mobile for speed */
+            .hide-mobile { display: none !important; }
+            footer { flex-direction: column !important; text-align: center; gap: 10px; }
+        }
     </style>
 </head>
 <body>
 
+<div id="loader-overlay">
+    <div class="hacker-window">
+        <div class="window-header">
+            <span>root@orbyx-mainframe:~</span>
+            <span class="window-controls">[ - ] [ □ ] [ x ]</span>
+        </div>
+        <div class="window-content">
+            <div class="loader-glitch">ORBYX</div>
+            <div class="cyber-progress"></div>
+            <div class="hack-text" id="hack-log">&gt; INITIATING SYSTEM BOOT...</div>
+        </div>
+    </div>
+</div>
+<script>
+    const logs = [
+        "> BYPASSING MAINFRAME FIREWALL...",
+        "> EXTRACTING TLE ORBITAL DATA...",
+        "> DECRYPTING CELESTRAK UPLINK...",
+        "> SYNCING SATELLITE CONSTELLATIONS...",
+        "> ENGAGING ORBITAL RADAR...",
+        "> ACCESS GRANTED."
+    ];
+    let hackIndex = 0;
+    const hackInterval = setInterval(() => {
+        if(hackIndex < logs.length) {
+            document.getElementById('hack-log').innerText = logs[hackIndex];
+            hackIndex++;
+        } else clearInterval(hackInterval);
+    }, 350);
+</script>
+
 <header>
     <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 1.8rem;">🚀</span>
         <div>
-            <h1 style="margin: 0; font-size: 1.1rem; letter-spacing: 0.05em;">TRACKING SYSTEM</h1>
+            <h1 style="margin: 0; font-size: 1.2rem; letter-spacing: 0.05em;"><span style="color:var(--accent-cyan);">ORBYX</span> TRACKING SYSTEM</h1>
             <div style="font-size: 0.7rem; color: var(--text-dim); transition: 0.3s;" id="last-update">LIVE FEED ACTIVE</div>
         </div>
     </div>
     <button class="btn" onclick="refreshMaps()" id="refresh-btn">
-        <span class="spinner" id="btn-spinner">🔄</span>
+        <span class="spinner" id="btn-spinner" style="font-family: monospace;">-</span>
         <span id="btn-text">REFRESH SYSTEM</span>
     </button>
 </header>
@@ -190,7 +408,7 @@
      <div class="sidebar">
         <!-- SEARCH SECTION -->
         <div>
-            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.5rem;">🔍 ADD SATELLITE</h3>
+            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.5rem;">[ ADD SATELLITE ]</h3>
             <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                 <input type="text" id="search-input" placeholder="Name or NORAD ID..." style="flex: 1; background: #0d1117; border: 1px solid var(--card-border); color: white; padding: 5px; border-radius: 4px;">
                 <button onclick="searchSat()" class="btn" style="padding: 5px 10px;">Go</button>
@@ -199,33 +417,49 @@
         </div>
 
         <!-- CONSTELLATION SECTION -->
-        <div style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
-            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">🛰️ CONSTELLATION</h3>
-{% for sat in satellites %}
-            <div class="satellite-item" style="justify-content: space-between;">
+        <div id="constellation-section" style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
+            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">[ CONSTELLATION ]</h3>
+{% for category, items in satellites|groupby('category') %}
+            <div style="font-size: 0.75rem; color: var(--accent-color); margin-top: 10px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase;">{{ category }}</div>
+            {% for sat in items %}
+            <div class="satellite-item" style="justify-content: space-between; margin-bottom: 5px; padding: 0.5rem;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="sat-icon" style="background-color: #58a6ff;"></div>
+                    <div class="sat-icon" style="background-color: #58a6ff; width: 6px; height: 6px;"></div>
                     <div>
-                        <div style="font-size: 0.85rem; font-weight: 600;">{{ sat.name }}</div>
-                        <div style="font-size: 0.7rem; color: var(--text-dim);">ID: {{ sat.norad_id }}</div>
+                        <div style="font-size: 0.8rem; font-weight: 600;">{{ sat.name }}</div>
+                        <div style="font-size: 0.65rem; color: var(--text-dim);">ID: {{ sat.norad_id }}</div>
                     </div>
                 </div>
                 <button onclick="removeSat('{{ sat.norad_id }}')" style="background: none; border: none; color: #ff4d4d; cursor: pointer; font-size: 0.8rem;">✕</button>
             </div>
             {% endfor %}
+{% else %}
+            <div style="font-size: 0.7rem; color: var(--text-dim);">No satellites actively tracked.</div>
+{% endfor %}
+        </div>
+
+        <!-- TELEMETRY SECTION -->
+        <div style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
+            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.5rem;">[ TELEMETRY ]</h3>
+            <div style="font-size: 0.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-family: 'Rajdhani', sans-serif; font-weight: bold;">
+                <div style="background: rgba(0,243,255,0.05); padding: 5px; border-left: 2px solid var(--accent-cyan);">CPU: <span id="cpu-load">12</span>%</div>
+                <div style="background: rgba(0,243,255,0.05); padding: 5px; border-left: 2px solid var(--accent-magenta);">MEM: <span id="mem-load">45</span>%</div>
+                <div style="background: rgba(0,243,255,0.05); padding: 5px; border-left: 2px solid var(--success);">NET: <span id="net-load">1.2</span> MB/s</div>
+                <div style="background: rgba(0,243,255,0.05); padding: 5px; border-left: 2px solid var(--accent-yellow);">UPLINK: LIVE</div>
+            </div>
         </div>
 
         <!-- VISIBILITY SECTION -->
         <div style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
-            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.5rem;">📊 COMING PASSES</h3>
+            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.5rem;">[ COMING PASSES ]</h3>
             <div id="pass-table" style="font-size: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 5px;">
                 Loading passes...
             </div>
         </div>
 
         <!-- GROUND STATION SECTION -->
-        <div style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
-            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">📡 OPS LOCATION</h3>
+        <div id="location-section" style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
+            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">[ OPS LOCATION ]</h3>
             <div class="card" style="padding: 10px; font-size: 0.8rem;">
                 <input type="text" id="gs-name" value="{{ ground_station.name }}" placeholder="Station Name" style="width: 100%; margin-bottom: 5px; background: transparent; border: none; color: white; font-weight: bold;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
@@ -237,18 +471,7 @@
             </div>
         </div>
         
-        <!-- TELEGRAM SECTION -->
-        <div style="border-top: 1px solid var(--card-border); padding-top: 1rem;">
-            <h3 style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">📲 TELEGRAM COMMS</h3>
-            <div class="card" style="padding: 10px; font-size: 0.75rem;">
-                <input type="password" id="tg-token" value="{{ telegram.get('bot_token', '') }}" placeholder="Bot Token" style="width: 100%; margin-bottom: 5px; background: #0d1117; border: 1px solid #333; color: white;">
-                <input type="text" id="tg-chat" value="{{ telegram.get('chat_id', '') }}" placeholder="Chat ID" style="width: 100%; margin-bottom: 5px; background: #0d1117; border: 1px solid #333; color: white;">
-                <div style="display: flex; gap: 5px;">
-                    <button onclick="updateTelegram()" class="btn" style="flex: 1; padding: 4px; font-size: 0.7rem; background: #30363d; color: white;">SET</button>
-                    <button onclick="testTelegram()" class="btn" style="flex: 1; padding: 4px; font-size: 0.7rem; background: #238636; color: white;">TEST</button>
-                </div>
-            </div>
-        </div>
+
         
         <div id="status-msg" style="margin-top: auto; font-size: 0.75rem; color: var(--accent-color); border-top: 1px solid var(--card-border); padding-top: 1rem;">
             SYSTEM NOMINAL
@@ -257,7 +480,7 @@
 
     <!-- NOTIFICATION OVERLAY -->
     <div id="alert-banner" style="display:none; position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: #ff4d4d; color: white; padding: 10px 20px; border-radius: 30px; z-index: 1000; box-shadow: 0 0 20px rgba(255,0,0,0.5); font-weight: bold; align-items: center; gap: 10px; animation: pulse 1s infinite alternate;">
-        <span>🔔 ALERT:</span> <span id="alert-text">SATELLITE APPROACHING</span>
+        <span>[ALERT]:</span> <span id="alert-text">SATELLITE APPROACHING</span>
     </div>
 
     <style>
@@ -266,7 +489,7 @@
         .grid-layout { display: grid; grid-template-columns: 2fr 1.2fr; gap: 1rem; flex: 1; min-height: 400px; }
     </style>
 
-    <div class="content">
+    <div class="content" id="map-view">
         <div class="grid-layout">
             <div class="map-container">
                 <div class="map-header">
@@ -278,7 +501,7 @@
 
             <div class="map-container">
                 <div class="map-header">
-                    <span>🔭 SKY-VIEW RADAR</span>
+                    <span>SKY-VIEW RADAR</span>
                     <span class="status-badge" style="background: #e3b341; color: black;">Topocentric</span>
                 </div>
                 <iframe id="map-sky" class="map-frame" src="/static/satellite_sky_view.html"></iframe>
@@ -295,24 +518,83 @@
     </div>
 </div>
 
+<footer style="border-top: 1px solid var(--accent-cyan); padding: 8px 20px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--accent-cyan); text-transform: uppercase; font-family: 'Orbitron', sans-serif; box-shadow: 0 -5px 15px rgba(0,243,255,0.1);">
+    <div style="display: flex; gap: 20px;">
+        <span>ORBYX OS v9.9</span>
+        <span class="hide-mobile" style="color: var(--success);">[SECURE UPLINK]</span>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center;">
+        <span class="hide-mobile">LATENCY: <span id="ping-ms">14</span>ms</span>
+        <span>UTC: <span id="utc-clock">00:00:00</span></span>
+    </div>
+</footer>
+
 <script>
-    // TELEGRAM FUNCTIONS
-    async function updateTelegram() {
-        const formData = new FormData();
-        formData.append('bot_token', document.getElementById('tg-token').value);
-        formData.append('chat_id', document.getElementById('tg-chat').value);
-        await fetch('/update-telegram', { method: 'POST', body: formData });
-        alert("Telegram configuration saved!");
+    setInterval(() => {
+        const d = new Date();
+        document.getElementById('utc-clock').innerText = d.toUTCString().split(' ')[4];
+    }, 1000);
+    setInterval(() => {
+        document.getElementById('ping-ms').innerText = Math.floor(Math.random() * 8 + 10);
+        document.getElementById('cpu-load').innerText = Math.floor(Math.random() * 20 + 10);
+        document.getElementById('mem-load').innerText = Math.floor(Math.random() * 5 + 40);
+        document.getElementById('net-load').innerText = (Math.random() * 5 + 0.5).toFixed(1);
+    }, 2000);
+
+    // ======== SYDH AI CORE APP ======== //
+    function sendSydhMsg() {
+        const input = document.getElementById('sydh-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+        
+        appendSydh(`> YOU: ${msg}`, '#fff');
+        input.value = "";
+        
+        // Simulate AI processing delay
+        const thinkingId = appendSydh(`> Sydh: PROCESSING QUERY...`, 'var(--text-dim)');
+        
+        setTimeout(() => {
+            let reply = "UNRECOGNIZED INPUT. TYPE 'help' OR 'features' FOR ASSISTANCE.";
+            const sm = msg.toLowerCase();
+            if (sm.includes("hello") || sm.includes("hi")) reply = "GREETINGS, OPERATOR. I AM SYDH. TYPE 'help' TO LEARN ABOUT THIS TERMINAL.";
+            else if (sm.includes("help") || sm.includes("how to")) reply = "TO USE THIS SYSTEM:\n1. SEARCH a satellite by Name or NORAD ID.\n2. Click 'GO' to plot its trajectory.\n3. Enter your OPS LOCATION to calculate overhead passes.";
+            else if (sm.includes("feature") || sm.includes("about") || sm.includes("what is") || sm.includes("included")) reply = "ORBYX OS FEATURES:\n- 2D MERCATOR TRACKING\n- 3D ORTHOGRAPHIC GLOBE\n- TOPOCENTRIC RADAR (Sky-View)\n- LIVE TELEMETRY & PASS PREDICTIONS";
+            else if (sm.includes("status")) reply = "ALL CONSTELLATION TRACKING SYSTEMS ARE NOMINAL. LATENCY IS OPTIMAL.";
+            else if (sm.includes("satellite") || sm.includes("track")) reply = "ORBYX CONTINUOUSLY TRACKS 89,000+ SATELLITES VIA ENCRYPTED CELESTRAK UPLINKS.";
+            else if (sm.includes("who are you") || sm.includes("name")) reply = "I AM SYDH, THE ORBYX EMBEDDED AI ASSISTANT. I PROVIDE TACTICAL OVERVIEW OF DASHBOARD PROTOCOLS.";
+            else if (sm.includes("pass") || sm.includes("visible")) reply = "CHECK THE 'COMING PASSES' SECTOR TO SEE EXACTLY WHEN SATELLITES WILL BE VISIBLE OVER YOUR LOCATION.";
+            else if (sm.includes("clear") || sm.includes("cls")) { 
+                document.getElementById('sydh-chat').innerHTML = "<div style='color: var(--accent-magenta); margin-bottom: 10px; font-family: \"Rajdhani\", monospace;'>> Sydh: MEMORY WIPED. HOW CAN I ASSIST?</div>"; 
+                return; 
+            }
+            
+            const tgt = document.getElementById(thinkingId);
+            if (tgt) {
+                tgt.innerText = `> Sydh: ${reply}`;
+                tgt.style.color = "var(--accent-magenta)";
+            }
+            const chat = document.getElementById('sydh-chat');
+            chat.scrollTop = chat.scrollHeight;
+        }, 800 + Math.random() * 1000);
     }
 
-    async function testTelegram() {
-        const btn = event.target;
-        btn.innerText = "SENDING...";
-        const res = await fetch('/test-telegram', { method: 'POST' });
-        const data = await res.json();
-        alert(data.status === 'success' ? "🚀 Test message sent to Telegram!" : "❌ Failed to send message. Check Token/ID.");
-        btn.innerText = "TEST";
+    function appendSydh(text, color) {
+        const chat = document.getElementById('sydh-chat');
+        const div = document.createElement('div');
+        const id = 'msg-' + Date.now();
+        div.id = id;
+        div.style.color = color;
+        div.style.marginBottom = "8px";
+        div.style.fontFamily = "'Rajdhani', monospace";
+        div.style.whiteSpace = "pre-wrap";
+        div.innerText = text;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+        return id;
     }
+
+
+
 
     // PAS CALCULATIONS & UPDATES
     async function updatePasses() {
@@ -336,8 +618,8 @@
                 row.className = "pass-row";
                 row.innerHTML = `
                     <div style="font-weight:600">${p.satellite}</div>
-                    <div>🕒${p.aos.time}</div>
-                    <div style="color:var(--accent-color)">⏳${p.duration_min}m</div>
+                    <div>T-${p.aos.time}</div>
+                    <div style="color:var(--accent-cyan)">DUR: ${p.duration_min}m</div>
                 `;
                 table.appendChild(row);
 
@@ -362,31 +644,64 @@
         const q = document.getElementById('search-input').value;
         const resDiv = document.getElementById('search-results');
         resDiv.innerHTML = "Searching...";
-        const response = await fetch(`/search?q=${q}`);
-        const data = await response.json();
-        resDiv.innerHTML = "";
-        data.forEach(s => {
-            const div = document.createElement('div');
-            div.style = "padding: 5px; border-bottom: 1px solid #222; cursor: pointer; display: flex; justify-content: space-between;";
-            div.innerHTML = `<span>${s.name} (${s.norad_id})</span> <span style="color: var(--accent-color)">+</span>`;
-            div.onclick = () => addSat(s.name, s.norad_id);
-            resDiv.appendChild(div);
-        });
+        try {
+            const response = await fetch(`/search?q=${q}`);
+            const data = await response.json();
+            resDiv.innerHTML = "";
+            if (data.length === 0) {
+                resDiv.innerHTML = "<div style='padding: 5px; color: var(--accent-magenta); font-family: Orbitron;'>NO SATS FOUND</div>";
+                return;
+            }
+            
+            const exactMatch = data.find(s => s.norad_id === q.trim() || s.name.toUpperCase() === q.toUpperCase().trim());
+            if (exactMatch && data.length === 1) {
+                resDiv.innerHTML = `<div style='color:var(--accent-yellow); font-family:Orbitron;'><span class='spinner' style='display:inline-block;'>-</span> AUTO-PLOTTING...</div>`;
+                addSat(exactMatch.name, exactMatch.norad_id);
+                return;
+            }
+
+            data.forEach(s => {
+                const div = document.createElement('div');
+                div.style = "padding: 5px; border-bottom: 1px solid rgba(0,243,255,0.2); cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s;";
+                div.innerHTML = `<span>${s.name} <span style="font-size:0.75em; color:var(--text-dim);">(${s.norad_id})</span></span> <span style="color: var(--accent-cyan); font-weight:bold;">+</span>`;
+                div.onmouseover = () => div.style.background = "rgba(0, 243, 255, 0.1)";
+                div.onmouseout = () => div.style.background = "transparent";
+                div.onclick = () => addSat(s.name, s.norad_id);
+                resDiv.appendChild(div);
+            });
+        } catch (e) {
+            resDiv.innerHTML = "<div style='padding: 5px; color: #ff003c;'>Search Failed!</div>";
+        }
+    }
+
+    async function updateSidebarSections() {
+        const html = await (await fetch('/')).text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        document.getElementById('constellation-section').innerHTML = doc.getElementById('constellation-section').innerHTML;
+        document.getElementById('location-section').innerHTML = doc.getElementById('location-section').innerHTML;
     }
 
     async function addSat(name, id) {
+        document.getElementById('search-results').innerHTML = `<div style='padding: 10px; color:var(--accent-cyan); font-family:Orbitron;'><span class='spinner' style='display:inline-block;'>-</span> CALCULATING ORBIT...</div>`;
         const formData = new FormData();
         formData.append('name', name);
         formData.append('norad_id', id);
         await fetch('/add-satellite', { method: 'POST', body: formData });
-        location.reload();
+        
+        await updateSidebarSections();
+        await refreshMaps();
+        
+        document.getElementById('search-results').innerHTML = "";
+        window.location.hash = "map-view";
     }
 
     async function removeSat(id) {
         const formData = new FormData();
         formData.append('norad_id', id);
         await fetch('/remove-satellite', { method: 'POST', body: formData });
-        location.reload();
+        
+        await updateSidebarSections();
+        await refreshMaps();
     }
 
     async function updateLocation() {
@@ -396,7 +711,9 @@
         formData.append('lon', document.getElementById('gs-lon').value);
         formData.append('ele', document.getElementById('gs-ele').value);
         await fetch('/update-location', { method: 'POST', body: formData });
-        location.reload(); // Konum değişince her şeyi sıfırla
+        
+        await updateSidebarSections();
+        await refreshMaps();
     }
 
     async function refreshMaps() {
@@ -419,7 +736,7 @@
                 updatePasses(); // Tabloyu da güncelle
                 msg.innerText = "SYSTEM NOMINAL - LAST REFRESH: " + new Date().toLocaleTimeString();
             } else {
-                msg.innerText = "❌ REFRESH FAILED";
+                msg.innerText = "REFRESH FAILED";
             }
         } finally {
             btn.disabled = false;
@@ -428,6 +745,25 @@
         }
     }
 </script>
+
+<!-- SYDH CHATBOT WIDGET -->
+<div id="sydh-tab" style="position: fixed; bottom: 40px; right: 20px; background: rgba(255, 0, 255, 0.1); border: 1px solid var(--accent-magenta); padding: 8px 15px; color: var(--accent-magenta); font-family: 'Orbitron', sans-serif; font-size: 0.8rem; cursor: pointer; z-index: 100; box-shadow: 0 0 15px rgba(255,0,255,0.2);" onclick="document.getElementById('sydh-bot').style.display='flex'; this.style.display='none'; document.getElementById('sydh-input').focus();">
+    [ SYDH AI ]
+</div>
+
+<div id="sydh-bot" class="hacker-window" style="position: fixed; bottom: 40px; right: 20px; width: 320px; z-index: 20000; border: 1px solid var(--accent-magenta); display: none; box-shadow: 0 0 30px rgba(255, 0, 255, 0.15), inset 0 0 20px rgba(255, 0, 255, 0.05); max-width: 90vw;">
+    <div class="window-header" style="background: var(--accent-magenta);">
+        <span>SYDH AI CORE</span>
+        <span class="window-controls" style="cursor:pointer;" onclick="document.getElementById('sydh-bot').style.display='none'; document.getElementById('sydh-tab').style.display='block';">[ x ]</span>
+    </div>
+    <div class="window-content" style="padding: 15px; height: 250px; background: rgba(0,0,0,0.95); overflow-y: auto; display: block;" id="sydh-chat">
+        <div style="color: var(--accent-magenta); margin-bottom: 10px; font-family: 'Rajdhani', monospace;">> Sydh: ONLINE. HOW CAN I ASSIST, OPERATOR?</div>
+    </div>
+    <div style="display: flex; border-top: 1px solid var(--accent-magenta);">
+        <input type="text" id="sydh-input" placeholder="Query Sydh..." style="flex: 1; background: #000; border: none; color: white; padding: 10px; outline: none; font-family: 'Rajdhani', sans-serif;" onkeypress="if(event.key === 'Enter') sendSydhMsg()">
+        <button class="btn" style="border:none; border-left: 1px solid var(--accent-magenta); background: rgba(255, 0, 255, 0.1); color: var(--accent-magenta); font-family: 'Orbitron', sans-serif; cursor: pointer; padding: 0 15px;" onclick="sendSydhMsg()">SEND</button>
+    </div>
+</div>
 
 </body>
 </html>
