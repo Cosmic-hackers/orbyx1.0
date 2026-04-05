@@ -1,8 +1,12 @@
-# 🛰️ Satellite Orbit Tracking & Mission Control
+# ORBYX: Satellite Orbit Tracking & Mission Control
 
-A professional, real-time satellite tracking dashboard with high-fidelity visualizations, topocentric radar analysis, and automated alerting systems. Built for satellite enthusiasts and mission operators.
+🌐 **Live Deployment:** [orbyx-dashboard-e170.onrender.com](https://orbyx-dashboard-e170.onrender.com/)
 
-![Dashboard Preview](docs/dashboard_preview.png)
+A professional, real-time cyber-themed satellite tracking dashboard with high-fidelity visualizations, topocentric radar analysis, and an embedded tactical AI. Built for satellite enthusiasts and mission operators.
+
+## System Interfaces
+![ORBYX Main Mission Control](docs/dashboard.png)
+![ORBYX AI Boot Terminal](docs/terminal.png)
 
 ## 🚀 Key Features
 
