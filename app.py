@@ -55,11 +55,14 @@ async def index(request: Request):
             if "category" not in s:
                 s["category"] = "Custom / Searched"
                 
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "satellites": sats,
-            "ground_station": config.get("ground_station", {})
-        })
+        return templates.TemplateResponse(
+            request=request,
+            name="index.html",
+            context={
+                "satellites": sats,
+                "ground_station": config.get("ground_station", {})
+            }
+        )
     except Exception as e:
         import traceback
         return HTMLResponse(content=f"<pre>{traceback.format_exc()}</pre>", status_code=500)
