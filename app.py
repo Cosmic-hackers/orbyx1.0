@@ -48,17 +48,21 @@ def save_config(config):
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    config = load_config()
-    sats = config.get("satellites", [])
-    for s in sats:
-        if "category" not in s:
-            s["category"] = "Custom / Searched"
-            
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "satellites": sats,
-        "ground_station": config.get("ground_station", {})
-    })
+    try:
+        config = load_config()
+        sats = config.get("satellites", [])
+        for s in sats:
+            if "category" not in s:
+                s["category"] = "Custom / Searched"
+                
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "satellites": sats,
+            "ground_station": config.get("ground_station", {})
+        })
+    except Exception as e:
+        import traceback
+        return HTMLResponse(content=f"<pre>{traceback.format_exc()}</pre>", status_code=500)
 
 
 @app.get("/search")
