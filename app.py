@@ -14,6 +14,15 @@ from satellite_sky_view import generate_sky_view
 
 app = FastAPI(title="Mission Control Dashboard")
 
+@app.on_event("startup")
+async def startup_event():
+    """Generates necessary files into the ephemeral /static/ directory upon Render server boot."""
+    fetch_active_catalog()
+    generate_2d_map("static/satellite_track_2d.html")
+    generate_3d_map("static/satellite_track_3d.html")
+    generate_sky_view("static/satellite_sky_view.html")
+    
+
 @app.get("/passes")
 async def get_all_passes():
     """Tüm takibe alınan uydular için önümüzdeki geçişleri hesaplar."""
